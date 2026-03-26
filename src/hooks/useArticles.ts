@@ -3,7 +3,9 @@
 import { useState, useEffect } from "react";
 import { Article, FetchState } from "@/types/article";
 
-const API_URL = "https://dantexxi-api-uega.onrender.com/v1/articles";
+const API_URL = process.env.NODE_ENV === "development" 
+  ? "http://localhost:8080/api/v1/articles" 
+  : "https://dantexxi-api-uega.onrender.com/v1/articles";
 
 export function useArticles() {
   const [articles, setArticles] = useState<Article[]>([]);

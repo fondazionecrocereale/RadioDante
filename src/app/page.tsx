@@ -1,14 +1,30 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { useArticles } from '@/hooks/useArticles';
 import { ArticleCard, ArticleShimmer } from '@/components/ArticleItems';
 
 export default function Home() {
   const { articles, state, error } = useArticles();
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(err => console.error("Playback failed:", err));
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const STREAM_URL = "http://localhost:8080/api/v1/stream";
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-[#fcf9f4] text-[#1c1c19] selection:bg-primary-container selection:text-on-primary-container font-body">
+      <audio ref={audioRef} src={STREAM_URL} preload="none" />
+      
       {/* Live Ticker Bar */}
       <div className="bg-on-surface text-surface py-2 overflow-hidden border-b border-outline-variant/15">
         <div className="flex whitespace-nowrap overflow-hidden">
@@ -89,14 +105,17 @@ export default function Home() {
               <h2 className="font-headline text-3xl font-black uppercase tracking-tighter">Live Radio & Video 24/7</h2>
               <div className="flex items-center gap-4">
                 <span className="flex items-center gap-2 font-label text-[10px] uppercase font-bold text-primary">
-                  <span className="w-2 h-2 bg-primary rounded-full animate-pulse" /> Live Now
+                  <span className={`w-2 h-2 bg-primary rounded-full ${isPlaying ? 'animate-pulse' : ''}`} /> Live Now
                 </span>
                 <span className="font-label text-[10px] uppercase font-bold opacity-40 italic">Buon Giorno Buenos Aires</span>
               </div>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-              <div className="lg:col-span-8 relative group overflow-hidden bg-on-surface aspect-video">
+              <div 
+                onClick={togglePlay}
+                className="lg:col-span-8 relative group overflow-hidden bg-on-surface aspect-video cursor-pointer"
+              >
                 {/* VIDEO PLACEHOLDER */}
                 <img 
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuDu8MC54-TlrDh0zOc3wNIQcocZCf78gCKPFeYdDxfJPTGct-FU6hvRerWqyREJD2OcGT6IuhbMbz4JEcx0nQjIrVF_0W8lkEWXc_MjHVFyKjFtkmofZy3Tr6JTZrUYqUu-KUeLqet6Q5yGirNkII3rL-apZK2-PGGeea0BH8TFxHXwC3b5FKIWtPw1649EF4gQ1wSrkJxidk3fMrOx0wLRD-zs4p4pt9GRIMixQntXnAJckBQmiNLr9pl5t2fwwWX2evGHWPgmZVo"
@@ -104,11 +123,14 @@ export default function Home() {
                   className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-700"
                 />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <span className="material-symbols-outlined text-white text-8xl opacity-80 group-hover:scale-110 transition-transform">play_circle</span>
+                  <span className="material-symbols-outlined text-white text-8xl opacity-80 group-hover:scale-110 transition-transform">
+                    {isPlaying ? "pause_circle" : "play_circle"}
+                  </span>
                 </div>
-                <div className="absolute bottom-8 left-8 text-white z-10 space-y-2">
+                <div className="absolute bottom-8 left-8 text-white z-10 space-y-2 translate-y-2 group-hover:translate-y-0 transition-transform">
                   <span className="bg-primary px-3 py-1 font-label text-[10px] font-bold uppercase tracking-widest">In Onda</span>
                   <h3 className="font-headline text-4xl font-bold italic tracking-tight">Il Ponte Transatlantico: Live da Genova</h3>
+                  {isPlaying && <p className="font-label text-xs animate-pulse text-primary-container">Streaming Live...</p>}
                 </div>
               </div>
 
