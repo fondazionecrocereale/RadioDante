@@ -19,7 +19,7 @@ export default function Home() {
     setIsPlaying(!isPlaying);
   };
 
-  const STREAM_URL = "http://localhost:8080/api/v1/stream";
+  const STREAM_URL = "https://radiodante.onrender.com/api/v1/stream";
 
   return (
     <div className="flex flex-col min-h-screen bg-[#fcf9f4] text-[#1c1c19] selection:bg-primary-container selection:text-on-primary-container font-body">
